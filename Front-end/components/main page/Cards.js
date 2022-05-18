@@ -4,11 +4,9 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { NFTsabi, NFTs_Contract_Address } from "../../constants/nft";
 import Web3Modal from "web3modal";
-import img from "../../public/simon-lee-ldg40aCeOXo-unsplash.jpg";
-// import img from "../../public/big.jpg";
 import Loader from "../../styles/helpers/Loader";
 
-const Cards = () => {
+const Cards = ({ imgName }) => {
   const isWhitelisted = useSelector((state) => state.whitelistState.value);
   const presaleStarted = useSelector(
     (state) => state.whitelistState.presaleStarted
@@ -108,11 +106,11 @@ const Cards = () => {
   };
 
   return (
-    <div className="bg-[rgba(212,133,47)] rounded-lg shadow-2xl">
+    <div className="bg-[rgba(212,133,47)] rounded-lg shadow-2xl p-3">
       <Image
-        src={img}
+        src={imgName}
         alt="digital img"
-        className="rounded-t-lg"
+        className="rounded-t-lg  bg-orange-200"
         width={500}
         height={500}
       />
