@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { NFTsabi, NFTs_Contract_Address } from "../../constants/nft";
 import Web3Modal from "web3modal";
 import img from "../../public/simon-lee-ldg40aCeOXo-unsplash.jpg";
+// import img from "../../public/big.jpg";
 import Loader from "../../styles/helpers/Loader";
 
 const Cards = () => {
