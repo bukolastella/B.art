@@ -4,5 +4,6 @@ export default function handler(req, res) {
   const tokenId = req.query.id;
   const name = `B.art #${tokenId}`;
   const description = "A collection of B.art";
-  const image = res.status(200).json({ name: "John Doe" });
+  const image = `https://raw.githubusercontent.com/bukolastella/B.art/main/Front-end/public/${tokenId}.svg`;
+  res.status(200).json({ name, description, image });
 }
