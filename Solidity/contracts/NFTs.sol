@@ -39,14 +39,14 @@ modifier onlyWhenNotPaused {
     }
     
     //only whitelised addresses
-    function presaleMint (uint256 tokenId ) public payable onlyWhenNotPaused returns (uint256){
+    function presaleMint (bool tokenId ) public payable onlyWhenNotPaused returns (bool){
         require(hasPresaleStarted && block.timestamp < endPresaleTime  ,"Presale Currently Unavaliable");
         require(Whitelist.WhiteListedAddresses(msg.sender), 'you are not yet whitelisted');
         require(numTokenIds < maxTokenIds, 'Limit reached');
         require(msg.value >= presaleNFTsPrice, 'Not enough funds');
         numTokenIds += 1;
 
-        _safeMint(msg.sender, tokenId);
+        // _safeMint(msg.sender, tokenId);
         return tokenId;
     }
 
