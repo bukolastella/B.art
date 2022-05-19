@@ -346,7 +346,10 @@ const Hero = () => {
       </div>
       <div className="flex justify-between items-center py-7">
         <span className="text-3xl">B.art</span>
-        <span className="bg-black p-3 text-white rounded-md">
+        <span
+          className="bg-black p-3 text-white rounded-md cursor-pointer"
+          onClick={connectWallet}
+        >
           {isWalletConnected ? "Wallet Connected" : "Connect Wallet"}
         </span>
       </div>
