@@ -5,5 +5,5 @@ export default function handler(req, res) {
   const name = `B.art #${tokenId}`;
   const description = "A collection of B.art";
   const image = `https://raw.githubusercontent.com/bukolastella/B.art/main/Front-end/public/${tokenId}.svg`;
-  return res.status(200).json({ name, description, image });
+  return res.json({ name, description, image });
 }
