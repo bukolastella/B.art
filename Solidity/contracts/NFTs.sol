@@ -63,12 +63,17 @@ modifier onlyWhenNotPaused {
      function _baseURI() internal view virtual override returns (string memory) {
           return baseTokenURI;
       }
+      
+      
+      function exists(uint256 tokenId) public view returns (bool) {
+        return _exists(tokenId);
+    }
 
       function setPaused (bool val) public onlyOwner {
           paused = val;
       }
-
-function withdraw() public onlyOwner  {
+      
+      function withdraw() public onlyOwner  {
           address owner = owner();
           uint256 amount = address(this).balance;
           (bool sent,) = owner.call{value:amount}("");

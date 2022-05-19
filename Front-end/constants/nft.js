@@ -171,6 +171,25 @@ export const NFTsabi = [
         type: "uint256",
       },
     ],
+    name: "exists",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
     name: "getApproved",
     outputs: [
       {
@@ -581,4 +600,4 @@ export const NFTsabi = [
   },
 ];
 export const NFTs_Contract_Address =
-  "0xFC68fc87269f96406Ed2165C9D65aC23344A150d";
+  "0x72c6886b6CD5e4a250Ae6D31dE74AC31b13e0A27";
