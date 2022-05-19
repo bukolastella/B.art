@@ -306,19 +306,13 @@ export const NFTsabi = [
   {
     inputs: [
       {
-        internalType: "bool",
+        internalType: "uint256",
         name: "tokenId",
-        type: "bool",
+        type: "uint256",
       },
     ],
     name: "presaleMint",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
+    outputs: [],
     stateMutability: "payable",
     type: "function",
   },
@@ -581,4 +575,4 @@ export const NFTsabi = [
   },
 ];
 export const NFTs_Contract_Address =
-  "0x3a1bfD0e687d23e4Cd1f08518675a7419bE49B3C";
+  "0x91cFDC6a9e94c5948D80c2D4736741f34b5fc316";
