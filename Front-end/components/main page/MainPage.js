@@ -9,7 +9,7 @@ import img5 from "../../public/5.svg";
 import img6 from "../../public/6.svg";
 import img7 from "../../public/7.svg";
 import img8 from "../../public/8.svg";
-import img9 from "../../public/8.svg";
+import img9 from "../../public/9.svg";
 
 const MainPage = () => {
   const renderCards = () => {
