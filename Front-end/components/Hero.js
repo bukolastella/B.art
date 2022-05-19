@@ -312,7 +312,7 @@ const Hero = () => {
         <>
           <div>
             <span className="font-bold">Presale has started</span> | Token
-            Minted: {tokenIdsMinted}/20
+            Minted: {tokenIdsMinted}/10
           </div>
           <div className="font-bold">{time} minutes left!</div>
         </>
