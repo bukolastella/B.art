@@ -50,13 +50,13 @@ modifier onlyWhenNotPaused {
     }
 
 
-    function publicMint () public payable onlyWhenNotPaused{
+    function publicMint (uint256 tokenId) public payable onlyWhenNotPaused{
         require(hasPresaleStarted && block.timestamp >= endPresaleTime,'Public mint currently unavailable');
         require(numTokenIds < maxTokenIds, 'Limit reached' );
         require(msg.value >= publicNFTsPrice, 'Not enough funds');
         numTokenIds += 1;
 
-        _safeMint(msg.sender, numTokenIds);
+        _safeMint(msg.sender, tokenId);
     }
 
 

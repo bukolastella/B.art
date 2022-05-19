@@ -317,7 +317,13 @@ export const NFTsabi = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
     name: "publicMint",
     outputs: [],
     stateMutability: "payable",
@@ -575,4 +581,4 @@ export const NFTsabi = [
   },
 ];
 export const NFTs_Contract_Address =
-  "0x91cFDC6a9e94c5948D80c2D4736741f34b5fc316";
+  "0x2425C863fB1f825790e02d46D15B6CF49BA4FF7c";

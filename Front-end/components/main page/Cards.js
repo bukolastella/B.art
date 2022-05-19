@@ -70,9 +70,7 @@ const Cards = ({ imgName, tokenId }) => {
       const tx = await whitelistContract.presaleMint(tokenId, {
         value: utils.parseEther("0.005"),
       });
-      console.log(tx, "pppp");
       await tx.wait();
-      console.log(tx, "ppphhkj");
       setLoading(false);
       window.alert("You successfully minted a Crypto Dev!");
     } catch (err) {
@@ -90,7 +88,7 @@ const Cards = ({ imgName, tokenId }) => {
         NFTsabi,
         signer
       );
-      const tx = await whitelistContract.publicMint({
+      const tx = await whitelistContract.publicMint(tokenId, {
         value: utils.parseEther("0.01"),
       });
       await tx.wait();
