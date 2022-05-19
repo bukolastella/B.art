@@ -67,7 +67,7 @@ const Cards = ({ imgName, tokenId }) => {
         NFTsabi,
         signer
       );
-      const tx = await whitelistContract.presaleMint(tokenId, {
+      const tx = await whitelistContract.presaleMint(true, {
         value: utils.parseEther("0.005"),
       });
       console.log(tx, "pppp");
