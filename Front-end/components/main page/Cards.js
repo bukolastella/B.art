@@ -6,7 +6,7 @@ import { NFTsabi, NFTs_Contract_Address } from "../../constants/nft";
 import Web3Modal from "web3modal";
 import Loader from "../../styles/helpers/Loader";
 
-const Cards = ({ imgName }) => {
+const Cards = ({ imgName, tokenId }) => {
   const isWhitelisted = useSelector((state) => state.whitelistState.value);
   const presaleStarted = useSelector(
     (state) => state.whitelistState.presaleStarted
@@ -67,10 +67,12 @@ const Cards = ({ imgName }) => {
         NFTsabi,
         signer
       );
-      const tx = await whitelistContract.presaleMint({
+      const tx = await whitelistContract.presaleMint(tokenId, {
         value: utils.parseEther("0.005"),
       });
+      console.log(tx, "pppp");
       await tx.wait();
+      console.log(tx, "ppphhkj");
       setLoading(false);
       window.alert("You successfully minted a Crypto Dev!");
     } catch (err) {
