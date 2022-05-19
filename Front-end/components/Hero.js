@@ -245,7 +245,8 @@ const Hero = () => {
       web3ModalRef.current = new Web3Modal({
         network: "rinkeby",
         providerOptions: {},
-        disableInjectedProvider: false,
+        disableInjectedProvider: true,
+        // disableInjectedProvider: false,
       });
     }
     connectWallet();
