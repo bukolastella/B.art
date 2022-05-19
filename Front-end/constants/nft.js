@@ -581,4 +581,4 @@ export const NFTsabi = [
   },
 ];
 export const NFTs_Contract_Address =
-  "0x2425C863fB1f825790e02d46D15B6CF49BA4FF7c";
+  "0xAe282B3Cac167102bdFb559d76fbf1332eA8fA33";
