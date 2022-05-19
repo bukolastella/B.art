@@ -304,9 +304,21 @@ export const NFTsabi = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "bool",
+        name: "tokenId",
+        type: "bool",
+      },
+    ],
     name: "presaleMint",
-    outputs: [],
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
     stateMutability: "payable",
     type: "function",
   },
