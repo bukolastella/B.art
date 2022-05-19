@@ -20,7 +20,7 @@ const Hero = () => {
   const [owner, setOwner] = useState(false);
   const [numOfWhitelisted, setNumOfWhitelisted] = useState(0);
   const [tokenIdsMinted, setTokenIdsMinted] = useState("0");
-  const [time, setTime] = useState(10);
+  const [time, setTime] = useState(null);
 
   const web3ModalRef = useRef();
   const dispatch = useDispatch();
@@ -32,11 +32,7 @@ const Hero = () => {
     (state) => state.whitelistState.presaleEnded
   );
 
-  const onGoing =
-    presaleStarted &&
-    !presaleEnded &&
-    presaleStarted != null &&
-    presaleEnded != null;
+  const onGoing = presaleStarted && !presaleEnded && presaleStarted != null;
 
   // helpers function
   const getProviderOrSigner = useCallback(async (needigner = false) => {
@@ -168,6 +164,21 @@ const Hero = () => {
     }
   }, [getProviderOrSigner, getOwner, dispatch]);
 
+  const getEndPresaleTime = useCallback(async () => {
+    try {
+      const provider = await getProviderOrSigner();
+      const contract = new Contract(NFTs_Contract_Address, NFTsabi, provider);
+      const time = await contract.endPresaleTime();
+      const endTime = new Date(Number(time.toString() + "000"));
+      const now = new Date();
+      const cal = Math.ceil((endTime - now) / 60000);
+      if (cal < 1) setPresaleEnded(true);
+      setTime(cal);
+    } catch (error) {
+      errorModal(error);
+    }
+  }, [getProviderOrSigner]);
+
   const checkIfPresaleEnded = useCallback(async () => {
     try {
       const provider = await getProviderOrSigner();
@@ -224,8 +235,9 @@ const Hero = () => {
     const presaleStarted = await checkIfPresaleStarted();
     if (presaleStarted) {
       await checkIfPresaleEnded();
+      await getEndPresaleTime();
     }
-  }, [checkIfPresaleStarted, checkIfPresaleEnded]);
+  }, [checkIfPresaleStarted, checkIfPresaleEnded, getEndPresaleTime]);
 
   //
   useEffect(() => {
@@ -242,10 +254,9 @@ const Hero = () => {
     checkPresaleStatus();
     getTokenIdsMinted();
 
-    if (time) {
+    if (onGoing) {
       const interval = setInterval(async () => {
-        console.log("pppp");
-        setTime((prev) => prev - 1);
+        getEndPresaleTime();
         await getTokenIdsMinted();
       }, 60000);
       return () => clearInterval(interval);
@@ -258,7 +269,8 @@ const Hero = () => {
     checkPresaleStatus,
     getTokenIdsMinted,
     dispatch,
-    time,
+    onGoing,
+    getEndPresaleTime,
   ]);
 
   const renderButton = () => {
@@ -269,7 +281,7 @@ const Hero = () => {
         </div>
       );
     } else {
-      if (owner) {
+      if (owner && !presaleStarted) {
         return (
           <button
             className="p-3 bg-[rgba(212,133,47)] text-white"

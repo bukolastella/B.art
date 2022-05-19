@@ -14,11 +14,7 @@ const Cards = ({ imgName, tokenId }) => {
   const presaleEnded = useSelector(
     (state) => state.whitelistState.presaleEnded
   );
-  const onGoing =
-    presaleStarted &&
-    !presaleEnded &&
-    presaleStarted != null &&
-    presaleEnded != null;
+  const onGoing = presaleStarted && !presaleEnded && presaleStarted != null;
   const web3ModalRef = useRef();
   const [loading, setLoading] = useState(false);
 
