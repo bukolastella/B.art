@@ -36,21 +36,25 @@ const Hero = () => {
 
   // helpers function
   const getProviderOrSigner = useCallback(async (needigner = false) => {
-    const provider = await web3ModalRef.current.connect();
-    const web3Provider = new providers.Web3Provider(provider);
+    if (typeof window.ethereum === "undefined") {
+      throw new Error("MetaMask is NOT installed!");
+    } else {
+      const provider = await web3ModalRef.current.connect();
+      const web3Provider = new providers.Web3Provider(provider);
 
-    const { chainId } = await web3Provider.getNetwork();
-    if (chainId !== 4) {
-      errorModal("yo change to rinkeby");
-      throw new Error("Change network to Rinkeby");
+      const { chainId } = await web3Provider.getNetwork();
+      if (chainId !== 4) {
+        errorModal("yo change to rinkeby");
+        throw new Error("Change network to Rinkeby");
+      }
+
+      if (needigner) {
+        const signer = web3Provider.getSigner();
+        return signer;
+      }
+
+      return web3Provider;
     }
-
-    if (needigner) {
-      const signer = web3Provider.getSigner();
-      return signer;
-    }
-
-    return web3Provider;
   }, []);
 
   const connectWallet = useCallback(async () => {
@@ -369,7 +373,6 @@ const Hero = () => {
           <Image src={img} alt="hero picture" />
         </div>
       </div>
-
       {/* <div className="bottom-0 right-0 p-3 bg-white text-black fixed">
         <span>Time life till end of presale</span>
         <span>{endPresaleTime}</span>

@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { NFTsabi, NFTs_Contract_Address } from "../../constants/nft";
 import Web3Modal from "web3modal";
 import Loader from "../../styles/helpers/Loader";
+import Swal from "sweetalert2";
 
 const Cards = ({ imgName, tokenId }) => {
   const isWhitelisted = useSelector((state) => state.whitelistState.value);
@@ -19,22 +20,36 @@ const Cards = ({ imgName, tokenId }) => {
   const [loading, setLoading] = useState(false);
   const [tokenExists, setTokenExists] = useState(false);
 
+  const errorModal = (err) => {
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: err,
+    });
+    setLoading(false);
+    console.log(err);
+  };
+
   const getProviderOrSigner = useCallback(async (needigner = false) => {
-    const provider = await web3ModalRef.current.connect();
-    const web3Provider = new providers.Web3Provider(provider);
+    if (typeof window.ethereum === "undefined") {
+      throw new Error("MetaMask is NOT installed!");
+    } else {
+      const provider = await web3ModalRef.current.connect();
+      const web3Provider = new providers.Web3Provider(provider);
 
-    const { chainId } = await web3Provider.getNetwork();
-    if (chainId !== 4) {
-      // errorModal("yo change to rinkeby");
-      throw new Error("Change network to Rinkeby");
+      const { chainId } = await web3Provider.getNetwork();
+      if (chainId !== 4) {
+        errorModal("yo change to rinkeby");
+        throw new Error("Change network to Rinkeby");
+      }
+
+      if (needigner) {
+        const signer = web3Provider.getSigner();
+        return signer;
+      }
+
+      return web3Provider;
     }
-
-    if (needigner) {
-      const signer = web3Provider.getSigner();
-      return signer;
-    }
-
-    return web3Provider;
   }, []);
 
   const presaleMintHandler = async () => {
