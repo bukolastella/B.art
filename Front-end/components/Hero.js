@@ -35,7 +35,11 @@ const Hero = () => {
     NFTsContractSigner,
     NFTsContractProvider,
   } = useHook();
-  const onGoing = presaleStarted && !presaleEnded && presaleStarted != null;
+  const onGoing =
+    presaleStarted &&
+    !presaleEnded &&
+    presaleStarted != null &&
+    presaleEnded != null;
 
   // whitelist functions
   const checkIfAddressIsWhitelisted = useCallback(async () => {
@@ -80,18 +84,14 @@ const Hero = () => {
   // NFTs functions
   const getOwner = useCallback(async () => {
     try {
-      setLoading(true);
       const NFTsContract = await NFTsContractProvider();
       const whielist = await NFTsContract.owner();
       const signer = await getProviderOrSigner(true);
       const signerAddress = await signer.getAddress();
       if (signerAddress.toLowerCase() === whielist.toLowerCase())
         setOwner(true);
-
-      setLoading(false);
     } catch (error) {
       console.log(error);
-      setLoading(false);
     }
   }, [getProviderOrSigner, NFTsContractProvider]);
 
@@ -163,31 +163,31 @@ const Hero = () => {
     }
   };
 
-  console.log(presaleStarted);
-
   const checkPresaleStatus = useCallback(async () => {
     const presaleStarted = await checkIfPresaleStarted();
     if (presaleStarted) {
       await checkIfPresaleEnded();
       await getEndPresaleTime();
+      await getTokenIdsMinted();
     }
-    // if (presaleStarted) {
-    //   await checkIfPresaleEnded();
-    //   await getEndPresaleTime();
-    //   await getTokenIdsMinted();
-    // }
-    // else {
-    //   await checkIfAddressIsWhitelisted();
-    //   await getNoOfWhitelisted();
-    // }
-  }, [checkIfPresaleStarted, checkIfPresaleEnded, getEndPresaleTime]);
+
+    if (!presaleEnded) {
+      await checkIfAddressIsWhitelisted();
+      await getNoOfWhitelisted();
+    }
+  }, [
+    checkIfPresaleStarted,
+    checkIfPresaleEnded,
+    getEndPresaleTime,
+    getTokenIdsMinted,
+    presaleEnded,
+    checkIfAddressIsWhitelisted,
+    getNoOfWhitelisted,
+  ]);
 
   //
   useEffect(() => {
-    checkIfAddressIsWhitelisted();
-    getNoOfWhitelisted();
     checkPresaleStatus();
-    getTokenIdsMinted();
 
     if (onGoing) {
       const interval = setInterval(async () => {
@@ -197,8 +197,8 @@ const Hero = () => {
       return () => clearInterval(interval);
     }
   }, [
-    checkIfAddressIsWhitelisted,
-    getNoOfWhitelisted,
+    // checkIfAddressIsWhitelisted,
+    // getNoOfWhitelisted,
     checkPresaleStatus,
     getTokenIdsMinted,
     dispatch,
@@ -207,38 +207,40 @@ const Hero = () => {
   ]);
 
   const renderButton = () => {
-    if (loading) {
-      return (
-        <div className="flex justify-start items-center">
-          <Loader />
-        </div>
-      );
-    } else {
-      if (owner && !presaleStarted) {
+    if (presaleStarted != null) {
+      if (loading) {
         return (
-          <button
-            className="p-3 bg-[rgba(212,133,47)] text-white"
-            onClick={startPresale}
-          >
-            Start Presale
-          </button>
+          <div className="flex justify-start items-center">
+            <Loader />
+          </div>
         );
       } else {
-        if (!isWhitelisted && onGoing) {
+        if (owner && !presaleStarted) {
           return (
             <button
               className="p-3 bg-[rgba(212,133,47)] text-white"
-              onClick={addToWhitelistHandler}
+              onClick={startPresale}
             >
-              Join Whitelist
+              Start Presale
             </button>
           );
         } else {
-          return (
-            <div className="p-3 bg-[rgba(212,133,47)] text-white w-max">
-              You are all set!! Happy Minting.
-            </div>
-          );
+          if (!isWhitelisted && onGoing) {
+            return (
+              <button
+                className="p-3 bg-[rgba(212,133,47)] text-white"
+                onClick={addToWhitelistHandler}
+              >
+                Join Whitelist
+              </button>
+            );
+          } else {
+            return (
+              <div className="p-3 bg-[rgba(212,133,47)] text-white w-max">
+                You are all set!! Happy Minting.
+              </div>
+            );
+          }
         }
       }
     }
@@ -274,9 +276,11 @@ const Hero = () => {
 
   return (
     <div className="px-20 bg-[rgba(211,219,206)]">
-      <div className="p-3 bg-[#eceb98] text-[#3d3c0a] text-center">
-        {renderBanner()}
-      </div>
+      {presaleStarted != null && (
+        <div className="p-3 bg-[#eceb98] text-[#3d3c0a] text-center">
+          {renderBanner()}
+        </div>
+      )}
       <div className="flex justify-between items-center py-7">
         <span className="text-3xl">B.art</span>
         <span
