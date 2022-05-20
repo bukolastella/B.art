@@ -170,19 +170,24 @@ const Hero = () => {
     if (presaleStarted) {
       await checkIfPresaleEnded();
       await getEndPresaleTime();
-      await getTokenIdsMinted();
-    } else {
-      checkIfAddressIsWhitelisted();
-      getNoOfWhitelisted();
     }
+    // if (presaleStarted) {
+    //   await checkIfPresaleEnded();
+    //   await getEndPresaleTime();
+    //   await getTokenIdsMinted();
+    // }
+    // else {
+    //   await checkIfAddressIsWhitelisted();
+    //   await getNoOfWhitelisted();
+    // }
   }, [checkIfPresaleStarted, checkIfPresaleEnded, getEndPresaleTime]);
 
   //
   useEffect(() => {
-    // checkIfAddressIsWhitelisted();
-    // getNoOfWhitelisted();
+    checkIfAddressIsWhitelisted();
+    getNoOfWhitelisted();
     checkPresaleStatus();
-    // getTokenIdsMinted();
+    getTokenIdsMinted();
 
     if (onGoing) {
       const interval = setInterval(async () => {
