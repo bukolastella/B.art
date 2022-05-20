@@ -85,10 +85,10 @@ const Hero = () => {
       const whielist = await NFTsContract.owner();
       const signer = await getProviderOrSigner(true);
       const signerAddress = await signer.getAddress();
-      if (signerAddress.toLowerCase() === whielist.toLowerCase())
-        setOwner(true);
+      // if (signerAddress.toLowerCase() === whielist.toLowerCase())
+      // setOwner(true);
 
-      setLoading(false);
+      // setLoading(false);
     } catch (error) {
       console.log(error);
       setLoading(false);
@@ -99,14 +99,16 @@ const Hero = () => {
     try {
       const NFTsContract = await NFTsContractProvider();
       const presaleSatus = await NFTsContract.hasPresaleStarted();
+      console.log(presaleSatus);
       if (!presaleSatus) {
         await getOwner();
-        return Promise.reject("fail");
+        // return Promise.reject("fail");
       }
       dispatch(setPresaleStarted(presaleSatus));
+      return presaleSatus;
     } catch (error) {
       console.log(error);
-      return Promise.reject("fail");
+      // return Promise.reject("fail");
     }
   }, [getOwner, dispatch, NFTsContractProvider]);
 
@@ -165,41 +167,22 @@ const Hero = () => {
     }
   };
 
-  console.log(presaleStarted);
+  // console.log(presaleStarted);
 
   const checkPresaleStatus = useCallback(async () => {
-    Promise.all([
-      checkIfPresaleStarted(),
-      checkIfPresaleEnded(),
-      getEndPresaleTime(),
-      getTokenIdsMinted(),
-    ]).then((values) => console.log(values));
-    if (!presaleEnded) {
-      await checkIfAddressIsWhitelisted();
-      await getNoOfWhitelisted();
+    const presaleStarted = await checkIfPresaleStarted();
+    if (presaleStarted) {
+      await checkIfPresaleEnded();
+      await getEndPresaleTime();
     }
-    // const presaleStarted = await checkIfPresaleStarted();
-    // if (presaleStarted) {
-    //   await checkIfPresaleEnded();
-    //   await getEndPresaleTime();
-    //   await getTokenIdsMinted();
-    // } else {
-    //   await checkIfAddressIsWhitelisted();
-    //   await getNoOfWhitelisted();
-    // }
-  }, [
-    presaleEnded,
-    checkIfPresaleStarted,
-    checkIfAddressIsWhitelisted,
-    getNoOfWhitelisted,
-    getTokenIdsMinted,
-    checkIfPresaleEnded,
-    getEndPresaleTime,
-  ]);
+  }, [checkIfPresaleStarted, checkIfPresaleEnded, getEndPresaleTime]);
 
   //
   useEffect(() => {
     checkPresaleStatus();
+    getTokenIdsMinted();
+    checkIfAddressIsWhitelisted();
+    getNoOfWhitelisted();
 
     if (onGoing) {
       const interval = setInterval(async () => {
@@ -214,6 +197,8 @@ const Hero = () => {
     dispatch,
     onGoing,
     getEndPresaleTime,
+    checkIfAddressIsWhitelisted,
+    getNoOfWhitelisted,
   ]);
 
   const renderButton = () => {
