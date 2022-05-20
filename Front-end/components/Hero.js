@@ -274,6 +274,15 @@ const Hero = () => {
     }
   };
 
+  const renderConnectButton = () => (
+    <span
+      className="bg-black p-3 text-white rounded-md cursor-pointer"
+      onClick={connectWallet}
+    >
+      {isWalletConnected ? "Wallet Connected" : "Connect Wallet"}
+    </span>
+  );
+
   return (
     <div className="px-20 bg-[rgba(211,219,206)]">
       {presaleStarted != null && (
@@ -283,12 +292,7 @@ const Hero = () => {
       )}
       <div className="flex justify-between items-center py-7">
         <span className="text-3xl">B.art</span>
-        <span
-          className="bg-black p-3 text-white rounded-md cursor-pointer"
-          onClick={connectWallet}
-        >
-          {isWalletConnected ? "Wallet Connected" : "Connect Wallet"}
-        </span>
+        {renderConnectButton()}
       </div>
 
       <div className="flex justify-between items-center mt-12">
@@ -300,6 +304,7 @@ const Hero = () => {
             Explore digital art ntf<span className="lowercase ">s</span> with{" "}
             {numOfWhitelisted}/20 people
           </span>
+          {!isWalletConnected && renderConnectButton()}
           {renderButton()}
         </div>
         <div className="w-1/2">
