@@ -1,28 +1,22 @@
 import Image from "next/image";
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import img from "../public/img.jpg";
-import Web3Modal from "web3modal";
-import { providers, Contract } from "ethers";
 import Loader from "../styles/helpers/Loader";
-import { abi, Whitelist_Contract_Address } from "../constants";
-import Swal from "sweetalert2";
 import {
   changeWhitelistState,
   setPresaleEnded,
   setPresaleStarted,
 } from "../store/slice";
 import { useDispatch, useSelector } from "react-redux";
-import { NFTsabi, NFTs_Contract_Address } from "../constants/nft";
+import useHook from "../hooks";
 
 const Hero = () => {
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [loading, setLoading] = useState(false);
   const [owner, setOwner] = useState(false);
   const [numOfWhitelisted, setNumOfWhitelisted] = useState(0);
   const [tokenIdsMinted, setTokenIdsMinted] = useState("0");
   const [time, setTime] = useState(null);
 
-  const web3ModalRef = useRef();
   const dispatch = useDispatch();
   const isWhitelisted = useSelector((state) => state.whitelistState.value);
   const presaleStarted = useSelector(
@@ -31,108 +25,55 @@ const Hero = () => {
   const presaleEnded = useSelector(
     (state) => state.whitelistState.presaleEnded
   );
-
+  const {
+    getProviderOrSigner,
+    connectWallet,
+    isWalletConnected,
+    whitelistContractProvider,
+    whitelistContractSigner,
+    Modal,
+    NFTsContractSigner,
+    NFTsContractProvider,
+  } = useHook();
   const onGoing = presaleStarted && !presaleEnded && presaleStarted != null;
-
-  // helpers function
-  const getProviderOrSigner = useCallback(async (needigner = false) => {
-    if (typeof window.ethereum === "undefined") {
-      throw new Error("MetaMask is NOT installed!");
-    } else {
-      const provider = await web3ModalRef.current.connect();
-      const web3Provider = new providers.Web3Provider(provider);
-
-      const { chainId } = await web3Provider.getNetwork();
-      if (chainId !== 4) {
-        errorModal("yo change to rinkeby");
-        throw new Error("Change network to Rinkeby");
-      }
-
-      if (needigner) {
-        const signer = web3Provider.getSigner();
-        return signer;
-      }
-
-      return web3Provider;
-    }
-  }, []);
-
-  const connectWallet = useCallback(async () => {
-    try {
-      // setLoading(true);
-      await getProviderOrSigner();
-      setIsWalletConnected(true); //
-      // checkIfAddressIsWhitelisted();
-      // getNoOfWhitelisted();
-      // getTokenIdsMinted;
-      // setLoading(false);
-    } catch (error) {
-      errorModal(error);
-    }
-  }, [getProviderOrSigner]);
-
-  const errorModal = (err) => {
-    Swal.fire({
-      icon: "error",
-      title: "Oops...",
-      text: err,
-    });
-    setLoading(false);
-    console.log(err);
-  };
 
   // whitelist functions
   const checkIfAddressIsWhitelisted = useCallback(async () => {
     try {
-      // setLoading(true);
       const signer = await getProviderOrSigner(true);
-      const whitelistContract = new Contract(
-        Whitelist_Contract_Address,
-        abi,
-        signer
-      );
+      const whitelistContract = await whitelistContractSigner();
       const address = signer.getAddress();
       const isPartOfWhitelist = await whitelistContract.WhiteListedAddresses(
         address
       );
       dispatch(changeWhitelistState(isPartOfWhitelist));
-      // setLoading(false);
     } catch (error) {
-      errorModal(error);
+      console.log(error);
     }
-  }, [dispatch, getProviderOrSigner]);
+  }, [dispatch, getProviderOrSigner, whitelistContractSigner]);
 
   const getNoOfWhitelisted = useCallback(async () => {
     try {
-      const provider = await getProviderOrSigner();
-      const whitelistContract = new Contract(
-        Whitelist_Contract_Address,
-        abi,
-        provider
-      );
+      const whitelistContract = await whitelistContractProvider();
       const numOfWhitelisted = await whitelistContract.NoOfAddresses();
       setNumOfWhitelisted(numOfWhitelisted);
     } catch (error) {
-      errorModal(error);
+      console.log(error);
     }
-  }, [getProviderOrSigner]);
+  }, [whitelistContractProvider]);
 
   const addToWhitelistHandler = async () => {
     try {
       setLoading(true);
-      const signer = await getProviderOrSigner(true);
-      const whitelistContract = new Contract(
-        Whitelist_Contract_Address,
-        abi,
-        signer
-      );
+      const whitelistContract = await whitelistContractSigner();
       const tx = await whitelistContract.addToWhitelist(); //modal pops up
       await tx.wait();
       await getNoOfWhitelisted();
       dispatch(changeWhitelistState(true));
       setLoading(false);
     } catch (error) {
-      errorModal(error);
+      console.log(error);
+      setLoading(false);
     }
   };
 
@@ -140,9 +81,8 @@ const Hero = () => {
   const getOwner = useCallback(async () => {
     try {
       setLoading(true);
-      const provider = await getProviderOrSigner();
-      const contract = new Contract(NFTs_Contract_Address, NFTsabi, provider);
-      const whielist = await contract.owner();
+      const NFTsContract = await NFTsContractProvider();
+      const whielist = await NFTsContract.owner();
       const signer = await getProviderOrSigner(true);
       const signerAddress = await signer.getAddress();
       if (signerAddress.toLowerCase() === whielist.toLowerCase())
@@ -150,48 +90,42 @@ const Hero = () => {
 
       setLoading(false);
     } catch (error) {
-      errorModal(error);
+      console.log(error);
+      setLoading(false);
     }
-  }, [getProviderOrSigner]);
+  }, [getProviderOrSigner, NFTsContractProvider]);
 
   const checkIfPresaleStarted = useCallback(async () => {
     try {
-      const provider = await getProviderOrSigner();
-      const contract = new Contract(NFTs_Contract_Address, NFTsabi, provider);
-      const presaleSatus = await contract.hasPresaleStarted();
+      const NFTsContract = await NFTsContractProvider();
+      const presaleSatus = await NFTsContract.hasPresaleStarted();
       if (!presaleSatus) await getOwner();
       dispatch(setPresaleStarted(presaleSatus));
       return presaleSatus;
     } catch (error) {
-      errorModal(error);
+      console.log(error);
       return false;
     }
-  }, [getProviderOrSigner, getOwner, dispatch]);
+  }, [getOwner, dispatch, NFTsContractProvider]);
 
   const getEndPresaleTime = useCallback(async () => {
     try {
-      const provider = await getProviderOrSigner();
-      const contract = new Contract(NFTs_Contract_Address, NFTsabi, provider);
-      const time = await contract.endPresaleTime();
+      const NFTsContract = await NFTsContractProvider();
+      const time = await NFTsContract.endPresaleTime();
       const endTime = new Date(Number(time.toString() + "000"));
       const now = new Date();
       const cal = Math.ceil((endTime - now) / 60000);
       if (cal < 1) setPresaleEnded(true);
       setTime(cal);
     } catch (error) {
-      errorModal(error);
+      console.log(error);
     }
-  }, [getProviderOrSigner]);
+  }, [NFTsContractProvider]);
 
   const checkIfPresaleEnded = useCallback(async () => {
     try {
-      const provider = await getProviderOrSigner();
-      const nftContract = new Contract(
-        NFTs_Contract_Address,
-        NFTsabi,
-        provider
-      );
-      const _presaleEnded = await nftContract.endPresaleTime();
+      const NFTsContract = await NFTsContractProvider();
+      const _presaleEnded = await NFTsContract.endPresaleTime();
       const hasEnded = _presaleEnded.lt(Math.floor(Date.now() / 1000));
       if (hasEnded) {
         dispatch(setPresaleEnded(true));
@@ -203,60 +137,52 @@ const Hero = () => {
       console.error(err);
       return false;
     }
-  }, [getProviderOrSigner, dispatch]);
+  }, [NFTsContractProvider, dispatch]);
 
   const getTokenIdsMinted = useCallback(async () => {
     try {
-      const provider = await getProviderOrSigner();
-      const nftContract = new Contract(
-        NFTs_Contract_Address,
-        NFTsabi,
-        provider
-      );
-      const tokenIds = await nftContract.numTokenIds();
+      const NFTsContract = await NFTsContractProvider();
+      const tokenIds = await NFTsContract.numTokenIds();
       setTokenIdsMinted(tokenIds.toString());
     } catch (err) {
-      console.error(err);
+      console.log(err);
     }
-  }, [getProviderOrSigner]);
+  }, [NFTsContractProvider]);
 
   const startPresale = async () => {
     try {
       setLoading(true);
-      const signer = await getProviderOrSigner(true);
-      const contract = new Contract(NFTs_Contract_Address, NFTsabi, signer);
-      const whielist = await contract.startPresale();
-      await whielist.wait();
+      const NFTsContract = await NFTsContractSigner();
+      const presale = await NFTsContract.startPresale();
+      await presale.wait();
       dispatch(setPresaleStarted(true));
       setLoading(false);
     } catch (error) {
-      errorModal(error);
       console.log(error);
+      setLoading(false);
     }
   };
+
+  console.log(presaleStarted);
 
   const checkPresaleStatus = useCallback(async () => {
     const presaleStarted = await checkIfPresaleStarted();
     if (presaleStarted) {
       await checkIfPresaleEnded();
       await getEndPresaleTime();
+      await getTokenIdsMinted();
+    } else {
+      checkIfAddressIsWhitelisted();
+      getNoOfWhitelisted();
     }
   }, [checkIfPresaleStarted, checkIfPresaleEnded, getEndPresaleTime]);
 
   //
   useEffect(() => {
-    if (!isWalletConnected) {
-      web3ModalRef.current = new Web3Modal({
-        network: "rinkeby",
-        providerOptions: {},
-        disableInjectedProvider: false,
-      });
-    }
-    connectWallet();
-    checkIfAddressIsWhitelisted();
-    getNoOfWhitelisted();
+    // checkIfAddressIsWhitelisted();
+    // getNoOfWhitelisted();
     checkPresaleStatus();
-    getTokenIdsMinted();
+    // getTokenIdsMinted();
 
     if (onGoing) {
       const interval = setInterval(async () => {
@@ -266,8 +192,6 @@ const Hero = () => {
       return () => clearInterval(interval);
     }
   }, [
-    isWalletConnected,
-    connectWallet,
     checkIfAddressIsWhitelisted,
     getNoOfWhitelisted,
     checkPresaleStatus,
@@ -373,10 +297,6 @@ const Hero = () => {
           <Image src={img} alt="hero picture" />
         </div>
       </div>
-      {/* <div className="bottom-0 right-0 p-3 bg-white text-black fixed">
-        <span>Time life till end of presale</span>
-        <span>{endPresaleTime}</span>
-      </div> */}
     </div>
   );
 };
