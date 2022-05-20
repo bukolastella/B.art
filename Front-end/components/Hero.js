@@ -191,14 +191,12 @@ const Hero = () => {
 
     if (onGoing) {
       const interval = setInterval(async () => {
-        getEndPresaleTime();
+        await getEndPresaleTime();
         await getTokenIdsMinted();
       }, 60000);
       return () => clearInterval(interval);
     }
   }, [
-    // checkIfAddressIsWhitelisted,
-    // getNoOfWhitelisted,
     checkPresaleStatus,
     getTokenIdsMinted,
     dispatch,
@@ -237,7 +235,9 @@ const Hero = () => {
           } else {
             return (
               <div className="p-3 bg-[rgba(212,133,47)] text-white w-max">
-                You are all set!! Happy Minting.
+                {!presaleStarted
+                  ? "Wait for presale to start. Happy Minting."
+                  : "Happy Minting."}
               </div>
             );
           }

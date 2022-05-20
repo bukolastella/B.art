@@ -18,13 +18,20 @@ const Cards = ({ imgName, tokenId }) => {
   const [loading, setLoading] = useState(false);
   const [tokenExists, setTokenExists] = useState(false);
 
-  const mintHandler = async (amount) => {
+  const mintHandler = async () => {
     try {
       setLoading(true);
       const NFTsContract = await NFTsContractSigner();
-      const tx = await NFTsContract.publicMint(tokenId, {
-        value: utils.parseEther(amount),
-      });
+      let tx;
+      if (isWhitelisted && onGoing) {
+        tx = await NFTsContract.presaleMint(tokenId, {
+          value: utils.parseEther("0.005"),
+        });
+      } else {
+        tx = await NFTsContract.publicMint(tokenId, {
+          value: utils.parseEther("0.01"),
+        });
+      }
       await tx.wait();
       setLoading(false);
       Modal("sucess", "You successfully minted a Crypto Dev!");
@@ -34,11 +41,6 @@ const Cards = ({ imgName, tokenId }) => {
       Modal("error", "An Error Occured. Please try again later");
       setLoading(false);
     }
-  };
-
-  const selectMintHandler = () => {
-    if (isWhitelisted && onGoing) mintHandler("0.005");
-    else mintHandler("0.01");
   };
 
   const checkTokenExists = useCallback(async () => {
@@ -54,12 +56,13 @@ const Cards = ({ imgName, tokenId }) => {
     }
   }, [NFTsContractProvider, tokenId]);
 
+  console.log(isWhitelisted);
+
   //
   useEffect(() => {
     if (presaleStarted) {
       checkTokenExists();
       const interval = setInterval(async () => {
-        console.log("yy");
         checkTokenExists();
       }, 6000);
       return () => clearInterval(interval);
@@ -88,8 +91,12 @@ const Cards = ({ imgName, tokenId }) => {
           <div>{onGoing ? 0.005 : 0.01} ether</div>
         </div>
         <button
-          className=" bg-white rounded mt-4 px-4 py-2 w-full"
-          onClick={selectMintHandler}
+          className={`bg-white rounded mt-4 px-4 py-2 w-full ${
+            (!presaleStarted || isWhitelisted) &&
+            "opacity-50 cursor-not-allowed"
+          }`}
+          onClick={mintHandler}
+          disabled={!presaleStarted}
         >
           {loading ? <Loader /> : "Mint"}
         </button>
