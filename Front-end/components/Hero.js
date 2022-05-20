@@ -99,12 +99,14 @@ const Hero = () => {
     try {
       const NFTsContract = await NFTsContractProvider();
       const presaleSatus = await NFTsContract.hasPresaleStarted();
-      if (!presaleSatus) await getOwner();
+      if (!presaleSatus) {
+        await getOwner();
+        return Promise.reject("fail");
+      }
       dispatch(setPresaleStarted(presaleSatus));
-      return presaleSatus;
     } catch (error) {
       console.log(error);
-      return false;
+      return Promise.reject("fail");
     }
   }, [getOwner, dispatch, NFTsContractProvider]);
 
@@ -166,28 +168,38 @@ const Hero = () => {
   console.log(presaleStarted);
 
   const checkPresaleStatus = useCallback(async () => {
-    const presaleStarted = await checkIfPresaleStarted();
-    if (presaleStarted) {
-      await checkIfPresaleEnded();
-      await getEndPresaleTime();
+    Promise.all([
+      checkIfPresaleStarted(),
+      checkIfPresaleEnded(),
+      getEndPresaleTime(),
+      getTokenIdsMinted(),
+    ]).then((values) => console.log(values));
+    if (!presaleEnded) {
+      await checkIfAddressIsWhitelisted();
+      await getNoOfWhitelisted();
     }
+    // const presaleStarted = await checkIfPresaleStarted();
     // if (presaleStarted) {
     //   await checkIfPresaleEnded();
     //   await getEndPresaleTime();
     //   await getTokenIdsMinted();
-    // }
-    // else {
+    // } else {
     //   await checkIfAddressIsWhitelisted();
     //   await getNoOfWhitelisted();
     // }
-  }, [checkIfPresaleStarted, checkIfPresaleEnded, getEndPresaleTime]);
+  }, [
+    presaleEnded,
+    checkIfPresaleStarted,
+    checkIfAddressIsWhitelisted,
+    getNoOfWhitelisted,
+    getTokenIdsMinted,
+    checkIfPresaleEnded,
+    getEndPresaleTime,
+  ]);
 
   //
   useEffect(() => {
-    checkIfAddressIsWhitelisted();
-    getNoOfWhitelisted();
     checkPresaleStatus();
-    getTokenIdsMinted();
 
     if (onGoing) {
       const interval = setInterval(async () => {
@@ -197,8 +209,6 @@ const Hero = () => {
       return () => clearInterval(interval);
     }
   }, [
-    checkIfAddressIsWhitelisted,
-    getNoOfWhitelisted,
     checkPresaleStatus,
     getTokenIdsMinted,
     dispatch,
