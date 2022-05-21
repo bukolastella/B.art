@@ -71,7 +71,6 @@ const Cards = ({ imgName, tokenId }) => {
       return false;
     }
   }, [NFTsContractProvider, setFetching, tokenId]);
-  console.log(presaleStarted, isWhitelisted);
   //
   useEffect(() => {
     if (presaleStarted) {

@@ -197,7 +197,7 @@ const Hero = () => {
       const interval = setInterval(async () => {
         await getEndPresaleTime();
         await getTokenIdsMinted();
-      }, 60000);
+      }, 6000);
       return () => {
         clearInterval(interval);
         ignore = true;
