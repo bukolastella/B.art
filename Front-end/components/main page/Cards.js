@@ -89,7 +89,7 @@ const Cards = ({ imgName, tokenId }) => {
         <div className="bg-[rgba(212,133,47)] rounded-lg shadow-2xl p-3 relative min-h-[300px]">
           {tokenExists && (
             <div className=" absolute w-full h-full bg-white opacity-50 left-0 top-0 rounded-lg z-10 flex">
-              <span className=" text-red-600 text-5xl m-auto -rotate-45 font-bold ">
+              <span className=" text-red-600 text-5xl m-auto -rotate-45 font-bold text-center">
                 sold out
               </span>
             </div>
@@ -109,9 +109,8 @@ const Cards = ({ imgName, tokenId }) => {
             </div>
             <button
               className={`bg-white rounded mt-4 px-4 py-2 w-full ${
-                presaleStarted == null &&
-                (!presaleStarted || !isWhitelisted) &&
-                "opacity-50 cursor-not-allowed"
+                (presaleStarted && !isWhitelisted) ||
+                (presaleStarted == null && "opacity-50 cursor-not-allowed")
               }`}
               onClick={mintHandler}
               disabled={!presaleStarted}

@@ -10,6 +10,8 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import useHook from "../hooks";
 
+const textStyling = "text-center md:text-left";
+
 const Hero = () => {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -213,7 +215,7 @@ const Hero = () => {
     if (presaleStarted != null) {
       if (loading) {
         return (
-          <div className="flex justify-start items-center">
+          <div className={`flex justify-start items-center ${textStyling}`}>
             <Loader />
           </div>
         );
@@ -221,7 +223,7 @@ const Hero = () => {
         if (owner && !presaleStarted) {
           return (
             <button
-              className="p-3 bg-[rgba(212,133,47)] text-white"
+              className={`p-3 bg-[rgba(212,133,47)] text-white ${textStyling}`}
               onClick={startPresale}
             >
               Start Presale
@@ -231,7 +233,7 @@ const Hero = () => {
           if (!isWhitelisted && onGoing) {
             return (
               <button
-                className="p-3 bg-[rgba(212,133,47)] text-white"
+                className={`p-3 bg-[rgba(212,133,47)] text-white ${textStyling}`}
                 onClick={addToWhitelistHandler}
               >
                 Join Whitelist
@@ -239,7 +241,9 @@ const Hero = () => {
             );
           } else {
             return (
-              <div className="p-3 bg-[rgba(212,133,47)] text-white w-max">
+              <div
+                className={`p-3 bg-[rgba(212,133,47)] text-white w-fit m-auto  md:m-0 md:w-max ${textStyling}`}
+              >
                 {!presaleStarted
                   ? "Wait for presale to start. Happy Minting."
                   : "Happy Minting."}
@@ -281,7 +285,7 @@ const Hero = () => {
 
   const renderConnectButton = () => (
     <span
-      className="bg-black p-3 text-white rounded-md cursor-pointer"
+      className={`bg-black p-3 text-white rounded-md cursor-pointer ${textStyling} inline-block`}
       onClick={connectWallet}
     >
       {isWalletConnected ? "Wallet Connected" : "Connect Wallet"}
@@ -289,7 +293,9 @@ const Hero = () => {
   );
 
   return (
-    <div className="px-20 bg-[rgba(211,219,206)]">
+    <div
+      className={`px-4 md:px-10 lg:px-20 ${textStyling} bg-[rgba(211,219,206)]`}
+    >
       {!fetching && (
         <div className="p-3 bg-[#eceb98] text-[#3d3c0a] text-center">
           {renderBanner()}
@@ -300,10 +306,11 @@ const Hero = () => {
         {renderConnectButton()}
       </div>
 
-      <div className="flex justify-between items-center mt-12">
+      <div className="md:flex md:justify-between md:items-center mt-12">
         <div>
-          <h1 className="text-7xl">
-            Discover <br /> Rare Collection of <br /> Art and NFTs
+          <h1 className="text-4xl sm:text-5xl xl:text-7xl">
+            Discover <br /> Rare Collection <br className="md:hidden" /> of{" "}
+            <br /> Art and NFTs
           </h1>
           <span className="block my-4 uppercase">
             Explore digital art ntf<span className="lowercase ">s</span> with{" "}
@@ -312,7 +319,7 @@ const Hero = () => {
           {!isWalletConnected && !fetching && renderConnectButton()}
           {!fetching && renderButton()}
         </div>
-        <div className="w-1/2">
+        <div className="w-1/2 hidden md:block ml-0 md:ml-8 lg:ml-0">
           <Image src={img} alt="hero picture" />
         </div>
       </div>

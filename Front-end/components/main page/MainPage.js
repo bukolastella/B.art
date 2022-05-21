@@ -12,8 +12,8 @@ import img8 from "../../public/8.svg";
 
 const MainPage = () => {
   return (
-    <div className="p-20 bg-[rgba(211,219,206)]">
-      <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3  md:grid-cols-4 gap-10">
+    <div className="p-10 lg:p-20 bg-[rgba(211,219,206)]">
+      <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3  md:grid-cols-4 gap-10 md:gap-5 lg:gap-10">
         {[img1, img2, img3, img4, img5, img6, img7, img8].map((ev, i) => (
           <Cards imgName={ev} key={i} tokenId={i + 1} />
         ))}
