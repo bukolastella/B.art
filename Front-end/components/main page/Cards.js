@@ -67,6 +67,7 @@ const Cards = ({ imgName, tokenId }) => {
     } catch (err) {
       console.log(err);
       setTokenExists(false);
+      setFetching(false);
       return false;
     }
   }, [NFTsContractProvider, setFetching, tokenId]);
@@ -109,9 +110,10 @@ const Cards = ({ imgName, tokenId }) => {
             </div>
             <button
               className={`bg-white rounded mt-4 px-4 py-2 w-full ${
-                (presaleStarted && !isWhitelisted) ||
-                (presaleStarted == null && "opacity-50 cursor-not-allowed")
-              }`}
+                presaleStarted &&
+                !isWhitelisted &&
+                "opacity-50 cursor-not-allowed"
+              } ${!presaleStarted && "opacity-50 cursor-not-allowed"}`}
               onClick={mintHandler}
               disabled={!presaleStarted}
             >

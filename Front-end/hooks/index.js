@@ -48,6 +48,7 @@ const useHook = () => {
     try {
       await getProviderOrSigner();
       setIsWalletConnected(true);
+      setFetching(false);
     } catch (error) {
       console.log(error);
       setFetching(false);
