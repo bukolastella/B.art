@@ -56,8 +56,6 @@ const Cards = ({ imgName, tokenId }) => {
     }
   }, [NFTsContractProvider, tokenId]);
 
-  console.log(isWhitelisted);
-
   //
   useEffect(() => {
     if (presaleStarted) {

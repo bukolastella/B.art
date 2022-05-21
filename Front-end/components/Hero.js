@@ -12,6 +12,7 @@ import useHook from "../hooks";
 
 const Hero = () => {
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const [owner, setOwner] = useState(false);
   const [numOfWhitelisted, setNumOfWhitelisted] = useState(0);
   const [tokenIdsMinted, setTokenIdsMinted] = useState("0");
@@ -35,11 +36,7 @@ const Hero = () => {
     NFTsContractSigner,
     NFTsContractProvider,
   } = useHook();
-  const onGoing =
-    presaleStarted &&
-    !presaleEnded &&
-    presaleStarted != null &&
-    presaleEnded != null;
+  const onGoing = presaleStarted && !presaleEnded;
 
   // whitelist functions
   const checkIfAddressIsWhitelisted = useCallback(async () => {
@@ -163,38 +160,46 @@ const Hero = () => {
     }
   };
 
-  const checkPresaleStatus = useCallback(async () => {
-    const presaleStarted = await checkIfPresaleStarted();
-    if (presaleStarted) {
-      await checkIfPresaleEnded();
-      await getEndPresaleTime();
-      await getTokenIdsMinted();
-    }
+  const checkPresaleStatus = useCallback(
+    async (ignore) => {
+      const presaleStarted = await checkIfPresaleStarted();
+      if (presaleStarted) {
+        await checkIfPresaleEnded();
+        await getEndPresaleTime();
+        await getTokenIdsMinted();
+      }
 
-    if (!presaleEnded) {
-      await checkIfAddressIsWhitelisted();
-      await getNoOfWhitelisted();
-    }
-  }, [
-    checkIfPresaleStarted,
-    checkIfPresaleEnded,
-    getEndPresaleTime,
-    getTokenIdsMinted,
-    presaleEnded,
-    checkIfAddressIsWhitelisted,
-    getNoOfWhitelisted,
-  ]);
+      if (!presaleEnded) {
+        await checkIfAddressIsWhitelisted();
+        await getNoOfWhitelisted();
+      }
+      if (!ignore) setFetching(false);
+    },
+    [
+      checkIfPresaleStarted,
+      checkIfPresaleEnded,
+      getEndPresaleTime,
+      getTokenIdsMinted,
+      presaleEnded,
+      checkIfAddressIsWhitelisted,
+      getNoOfWhitelisted,
+    ]
+  );
 
   //
   useEffect(() => {
-    checkPresaleStatus();
+    let ignore = false;
+    checkPresaleStatus(ignore);
 
     if (onGoing) {
       const interval = setInterval(async () => {
         await getEndPresaleTime();
         await getTokenIdsMinted();
       }, 60000);
-      return () => clearInterval(interval);
+      return () => {
+        clearInterval(interval);
+        ignore = true;
+      };
     }
   }, [
     checkPresaleStatus,
@@ -247,7 +252,7 @@ const Hero = () => {
   };
 
   const renderBanner = () => {
-    if (!presaleStarted && presaleStarted != null) {
+    if (!presaleStarted) {
       return (
         <span>
           Presale has not started yet!! <br /> Join the whitelist to enjoy lower
@@ -264,7 +269,7 @@ const Hero = () => {
           <div className="font-bold">{time} minutes left!</div>
         </>
       );
-    } else if (presaleEnded && presaleEnded != null) {
+    } else if (presaleEnded) {
       return (
         <>
           <span className="font-bold">Presale has ended!!</span> | Token Minted:{" "}
@@ -285,7 +290,7 @@ const Hero = () => {
 
   return (
     <div className="px-20 bg-[rgba(211,219,206)]">
-      {presaleStarted != null && (
+      {!fetching && (
         <div className="p-3 bg-[#eceb98] text-[#3d3c0a] text-center">
           {renderBanner()}
         </div>
@@ -304,8 +309,8 @@ const Hero = () => {
             Explore digital art ntf<span className="lowercase ">s</span> with{" "}
             {numOfWhitelisted}/20 people
           </span>
-          {!isWalletConnected && renderConnectButton()}
-          {renderButton()}
+          {!isWalletConnected && !fetching && renderConnectButton()}
+          {!fetching && renderButton()}
         </div>
         <div className="w-1/2">
           <Image src={img} alt="hero picture" />
