@@ -8,6 +8,7 @@ import { NFTsabi, NFTs_Contract_Address } from "../constants/nft";
 const useHook = () => {
   const web3ModalRef = useRef();
   const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [fetching, setFetching] = useState(true);
 
   // helpers function
   const Modal = (type, message) => {
@@ -49,6 +50,7 @@ const useHook = () => {
       setIsWalletConnected(true);
     } catch (error) {
       console.log(error);
+      setFetching(false);
       Modal("error", error);
     }
   }, [getProviderOrSigner]);
@@ -105,6 +107,8 @@ const useHook = () => {
     Modal,
     NFTsContractSigner,
     NFTsContractProvider,
+    setFetching,
+    fetching,
   };
 };
 

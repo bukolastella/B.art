@@ -15,10 +15,21 @@ const Cards = ({ imgName, tokenId }) => {
   const presaleEnded = useSelector(
     (state) => state.whitelistState.presaleEnded
   );
-  const { NFTsContractSigner, NFTsContractProvider, Modal } = useHook();
-  const onGoing = presaleStarted && !presaleEnded;
+  const {
+    NFTsContractSigner,
+    NFTsContractProvider,
+    Modal,
+    isWalletConnected,
+    fetching,
+    setFetching,
+  } = useHook();
+  const onGoing =
+    presaleStarted &&
+    !presaleEnded &&
+    presaleEnded !== null &&
+    presaleStarted !== null;
   const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(true);
+  // const [fetching, setFetching] = useState(true);
   const [tokenExists, setTokenExists] = useState(false);
 
   const mintHandler = async () => {
@@ -58,8 +69,8 @@ const Cards = ({ imgName, tokenId }) => {
       setTokenExists(false);
       return false;
     }
-  }, [NFTsContractProvider, tokenId]);
-
+  }, [NFTsContractProvider, setFetching, tokenId]);
+  console.log(presaleStarted, isWhitelisted);
   //
   useEffect(() => {
     if (presaleStarted) {
@@ -98,7 +109,8 @@ const Cards = ({ imgName, tokenId }) => {
             </div>
             <button
               className={`bg-white rounded mt-4 px-4 py-2 w-full ${
-                (!presaleStarted || isWhitelisted) &&
+                presaleStarted == null &&
+                (!presaleStarted || !isWhitelisted) &&
                 "opacity-50 cursor-not-allowed"
               }`}
               onClick={mintHandler}
